@@ -8,6 +8,7 @@ import { Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import type { Role_Old, UserInfo } from "#/entity";
 import { BasicStatus } from "#/enum";
+import ExportButton from "@/components/export/ExportButton";
 
 // TODO: fix
 // const USERS: UserInfo[] = USER_LIST as UserInfo[];
@@ -46,7 +47,11 @@ export default function UserPage() {
 			dataIndex: "status",
 			align: "center",
 			width: 120,
-			render: (status) => <Badge variant={status === BasicStatus.DISABLE ? "error" : "success"}>{status === BasicStatus.DISABLE ? "Disable" : "Enable"}</Badge>,
+			render: (status) => (
+				<Badge variant={status === BasicStatus.DISABLE ? "error" : "success"}>
+					{status === BasicStatus.DISABLE ? "Disable" : "Enable"}
+				</Badge>
+			),
 		},
 		{
 			title: "Action",
@@ -80,11 +85,21 @@ export default function UserPage() {
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<div>User List</div>
-					<Button onClick={() => {}}>New</Button>
+					<div className="flex gap-2">
+						<ExportButton data={USERS} fileName="user_list" dataType="用户数据" />
+						<Button onClick={() => {}}>New</Button>
+					</div>
 				</div>
 			</CardHeader>
 			<CardContent>
-				<Table rowKey="id" size="small" scroll={{ x: "max-content" }} pagination={false} columns={columns} dataSource={USERS} />
+				<Table
+					rowKey="id"
+					size="small"
+					scroll={{ x: "max-content" }}
+					pagination={false}
+					columns={columns}
+					dataSource={USERS}
+				/>
 			</CardContent>
 		</Card>
 	);
