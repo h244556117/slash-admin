@@ -23,7 +23,16 @@ import { type ThemeColorPresets, ThemeLayout, ThemeMode } from "#/enum";
 export default function SettingButton() {
 	const { t } = useTranslation();
 	const settings = useSettings();
-	const { themeMode, themeColorPresets, themeLayout, themeStretch, breadCrumb, fontSize, fontFamily } = settings;
+	const {
+		themeMode,
+		themeColorPresets,
+		themeLayout,
+		themeStretch,
+		breadCrumb,
+		fontSize,
+		fontFamily,
+		themeAnimationEnabled,
+	} = settings;
 	const { setSettings } = useSettingActions();
 
 	const updateSettings = (partialSettings: Partial<SettingsType>) => {
@@ -31,6 +40,78 @@ export default function SettingButton() {
 			...settings,
 			...partialSettings,
 		});
+	};
+
+	const [isAnimating, setIsAnimating] = useState(false);
+
+	const createThemeTransition = (event: React.MouseEvent<HTMLDivElement>) => {
+		if (!themeAnimationEnabled) return;
+		if (isAnimating) return;
+
+		// Check for reduced motion preference
+		const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		if (prefersReducedMotion) {
+			updateSettings({ themeMode: themeMode === ThemeMode.Light ? ThemeMode.Dark : ThemeMode.Light });
+			return;
+		}
+
+		setIsAnimating(true);
+
+		const button = event.currentTarget;
+		const rect = button.getBoundingClientRect();
+
+		// Calculate the center and maximum radius for the circular animation
+		const centerX = rect.left + rect.width / 2;
+		const centerY = rect.top + rect.height / 2;
+		const maxRadius = Math.sqrt(Math.pow(centerX, 2) + Math.pow(centerY, 2));
+
+		// Create the circular animation element
+		const circle = document.createElement("div");
+		circle.style.position = "fixed";
+		circle.style.top = `${centerY}px`;
+		circle.style.left = `${centerX}px`;
+		circle.style.width = "0px";
+		circle.style.height = "0px";
+		circle.style.borderRadius = "50%";
+		circle.style.backgroundColor = themeMode === ThemeMode.Light ? "#1a1a1a" : "#ffffff";
+		circle.style.transform = "translate(-50%, -50%)";
+		circle.style.zIndex = "999999";
+		circle.style.pointerEvents = "none";
+		circle.style.willChange = "transform, width, height";
+
+		document.body.appendChild(circle);
+
+		// Check if Web Animations API is supported
+		if (circle.animate) {
+			// Use Web Animations API for smooth animation
+			circle.animate(
+				[
+					{ width: "0px", height: "0px", opacity: 1 },
+					{ width: `${maxRadius * 2}px`, height: `${maxRadius * 2}px`, opacity: 1 },
+					{ width: `${maxRadius * 2}px`, height: `${maxRadius * 2}px`, opacity: 0 },
+				],
+				{
+					duration: 600,
+					easing: "ease-in-out",
+					fill: "forwards",
+				},
+			).onfinish = () => {
+				// Remove the animation element after completion
+				document.body.removeChild(circle);
+				setIsAnimating(false);
+			};
+		} else {
+			// Fallback to CSS transitions for older browsers
+			circle.style.transition = "all 600ms ease-in-out";
+			circle.style.width = `${maxRadius * 2}px`;
+			circle.style.height = `${maxRadius * 2}px`;
+			circle.style.opacity = "0";
+
+			setTimeout(() => {
+				document.body.removeChild(circle);
+				setIsAnimating(false);
+			}, 600);
+		}
 	};
 
 	const sheetContentBgStyle: CSSProperties = {
@@ -95,23 +176,31 @@ export default function SettingButton() {
 							<Text variant="subTitle1">{t("sys.settings.mode")}</Text>
 							<div className="flex flex-row gap-4">
 								<Card
-									onClick={() => updateSettings({ themeMode: ThemeMode.Light })}
-									className="flex flex-1 h-20 cursor-pointer items-center justify-center"
+									onClick={(e) => {
+										createThemeTransition(e);
+										updateSettings({ themeMode: ThemeMode.Light });
+									}}
+									className={`flex flex-1 h-20 cursor-pointer items-center justify-center transition-all duration-300 ease-in-out ${isAnimating ? "pointer-events-none opacity-50" : ""}`}
 								>
 									<Icon
 										icon="local:ic-settings-mode-sun"
 										size="24"
 										color={themeMode === ThemeMode.Light ? themeVars.colors.palette.primary.default : ""}
+										className="transition-transform duration-300 ease-in-out hover:rotate-180"
 									/>
 								</Card>
 								<Card
-									onClick={() => updateSettings({ themeMode: ThemeMode.Dark })}
-									className="flex flex-1 h-20 cursor-pointer items-center justify-center"
+									onClick={(e) => {
+										createThemeTransition(e);
+										updateSettings({ themeMode: ThemeMode.Dark });
+									}}
+									className={`flex flex-1 h-20 cursor-pointer items-center justify-center transition-all duration-300 ease-in-out ${isAnimating ? "pointer-events-none opacity-50" : ""}`}
 								>
 									<Icon
 										icon="local:ic-settings-mode-moon"
 										size="24"
 										color={themeMode === ThemeMode.Dark ? themeVars.colors.palette.primary.default : ""}
+										className="transition-transform duration-300 ease-in-out hover:rotate-180"
 									/>
 								</Card>
 							</div>
@@ -326,19 +415,35 @@ export default function SettingButton() {
 							<div className="flex items-center justify-between">
 								<Text variant="subTitle2">{t("sys.settings.breadcrumb")}</Text>
 								<Switch checked={breadCrumb} onCheckedChange={(checked) => updateSettings({ breadCrumb: checked })} />
-								{/* <div className="flex items-center justify-between text-sm text-text-disabled">
-									<div>{t("sys.settings.multiTab")}</div>
-									<Switch checked={multiTab} onCheckedChange={(checked) => updateSettings({ multiTab: checked })} />
-								</div> */}
-								{/* <div className="flex items-center justify-between text-sm text-text-disabled">
-									<div>{t("sys.settings.darkSidebar")}</div>
-									<Switch checked={darkSidebar} onCheckedChange={(checked) => updateSettings({ darkSidebar: checked })} />
-								</div> */}
-								{/* <div className="flex items-center justify-between text-sm text-text-disabled">
-									<div>{t("sys.settings.accordion")}</div>
-									<Switch checked={accordion} onCheckedChange={(checked) => updateSettings({ accordion: checked })} />
-								</div> */}
 							</div>
+
+							{/* theme animation */}
+							<div className="flex items-center justify-between">
+								<Tooltip delayDuration={700} defaultOpen={false} disableHoverableContent>
+									<TooltipTrigger>
+										<Text variant="subTitle2">{t("sys.settings.themeAnimation")}</Text>
+										<Icon icon="solar:question-circle-linear" className="ml-1" />
+									</TooltipTrigger>
+									<TooltipContent>{t("sys.settings.themeAnimationTip")}</TooltipContent>
+								</Tooltip>
+								<Switch
+									checked={themeAnimationEnabled}
+									onCheckedChange={(checked) => updateSettings({ themeAnimationEnabled: checked })}
+								/>
+							</div>
+
+							{/* <div className="flex items-center justify-between text-sm text-text-disabled">
+						<div>{t("sys.settings.multiTab")}</div>
+						<Switch checked={multiTab} onCheckedChange={(checked) => updateSettings({ multiTab: checked })} />
+					</div> */}
+							{/* <div className="flex items-center justify-between text-sm text-text-disabled">
+						<div>{t("sys.settings.darkSidebar")}</div>
+						<Switch checked={darkSidebar} onCheckedChange={(checked) => updateSettings({ darkSidebar: checked })} />
+					</div> */}
+							{/* <div className="flex items-center justify-between text-sm text-text-disabled">
+						<div>{t("sys.settings.accordion")}</div>
+						<Switch checked={accordion} onCheckedChange={(checked) => updateSettings({ accordion: checked })} />
+					</div> */}
 						</div>
 					</div>
 				</ScrollArea>

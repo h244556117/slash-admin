@@ -166,7 +166,9 @@
 			"darkSidebar": "暗色侧边栏",
 			"accordion": "手风琴菜单",
 			"fullscreen": "全屏",
-			"exitFullscreen": "退出全屏"
+			"exitFullscreen": "退出全屏",
+			"themeAnimation": "主题切换动画",
+			"themeAnimationTip": "启用主题切换时的平滑过渡动画效果"
 		}
 	}
 }

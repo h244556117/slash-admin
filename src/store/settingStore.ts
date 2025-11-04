@@ -1,8 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
-import { FontFamilyPreset, typographyTokens } from "@/theme/tokens/typography";
 import { StorageEnum, ThemeColorPresets, ThemeLayout, ThemeMode } from "#/enum";
+import { FontFamilyPreset, typographyTokens } from "@/theme/tokens/typography";
 
 export type SettingsType = {
 	themeColorPresets: ThemeColorPresets;
@@ -16,6 +15,7 @@ export type SettingsType = {
 	fontFamily: string;
 	fontSize: number;
 	direction: "ltr" | "rtl";
+	themeAnimationEnabled: boolean;
 };
 type SettingStore = {
 	settings: SettingsType;
@@ -41,6 +41,7 @@ const useSettingStore = create<SettingStore>()(
 				fontFamily: FontFamilyPreset.openSans,
 				fontSize: Number(typographyTokens.fontSize.sm),
 				direction: "ltr",
+				themeAnimationEnabled: true,
 			},
 			actions: {
 				setSettings: (settings) => {
