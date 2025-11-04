@@ -140,6 +140,8 @@
 			"breadcrumb": "BreadCrumb",
 			"darkSidebar": "Dark Sidebar",
 			"exitFullscreen": "Exit FullScreen",
+			"themeAnimation": "Theme Transition Animation",
+			"themeAnimationTip": "Enable smooth transition animations when switching themes",
 			"family": "Family",
 			"font": "Font",
 			"fullscreen": "FullScreen",
