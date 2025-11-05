@@ -56,6 +56,25 @@ export enum PermissionType {
 	CATALOGUE = 1,
 	MENU = 2,
 	COMPONENT = 3,
+	ACTION = 4,
+}
+
+export enum PermissionAction {
+	READ = "read",
+	CREATE = "create",
+	UPDATE = "update",
+	DELETE = "delete",
+	MANAGE = "manage",
+}
+
+export enum PermissionResource {
+	USER_MANAGEMENT = "user-management",
+	ROLE_MANAGEMENT = "role-management",
+	SYSTEM_SETTINGS = "system-settings",
+	DATA_ANALYSIS = "data-analysis",
+	DASHBOARD = "dashboard",
+	COMPONENTS = "components",
+	FUNCTIONS = "functions",
 }
 
 export enum HtmlDataAttribute {
