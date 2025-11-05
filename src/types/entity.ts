@@ -18,6 +18,23 @@ export interface UserInfo {
 	menu?: MenuTree[];
 }
 
+export interface Role {
+	id: string; // uuid
+	name: string;
+	code: string;
+	isSuperAdmin?: boolean; // 标识是否为超级管理员
+	permissions?: Permission[];
+}
+
+export interface Permission {
+	id: string; // uuid
+	name: string;
+	code: string; // resource:action  example: "user-management:read"
+	resource: string; // 资源名称 example: "user-management"
+	action: string; // 操作名称 example: "read"
+	type: PermissionType; // 权限类型
+}
+
 export interface Permission_Old {
 	id: string;
 	parentId: string;
@@ -82,7 +99,9 @@ export interface Menu extends CommonOptions, MenuMetaInfo {
 	type: PermissionType;
 }
 
-export type MenuMetaInfo = Partial<Pick<NavItemDataProps, "path" | "icon" | "caption" | "info" | "disabled" | "auth" | "hidden">> & {
+export type MenuMetaInfo = Partial<
+	Pick<NavItemDataProps, "path" | "icon" | "caption" | "info" | "disabled" | "auth" | "hidden">
+> & {
 	externalLink?: URL;
 	component?: string;
 };

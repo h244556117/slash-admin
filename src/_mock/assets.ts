@@ -516,27 +516,168 @@ export const PERMISSION_LIST = [
 ];
 
 /**
+ * User permission mock
+ */
+const USER_MANAGEMENT_PERMISSIONS = [
+	{
+		id: "1",
+		name: "用户管理读取",
+		code: "user-management:read",
+		resource: "user-management",
+		action: "read",
+		type: PermissionType.ACTION,
+	},
+	{
+		id: "2",
+		name: "用户管理创建",
+		code: "user-management:create",
+		resource: "user-management",
+		action: "create",
+		type: PermissionType.ACTION,
+	},
+	{
+		id: "3",
+		name: "用户管理更新",
+		code: "user-management:update",
+		resource: "user-management",
+		action: "update",
+		type: PermissionType.ACTION,
+	},
+	{
+		id: "4",
+		name: "用户管理删除",
+		code: "user-management:delete",
+		resource: "user-management",
+		action: "delete",
+		type: PermissionType.ACTION,
+	},
+];
+
+const ROLE_MANAGEMENT_PERMISSIONS = [
+	{
+		id: "5",
+		name: "角色管理读取",
+		code: "role-management:read",
+		resource: "role-management",
+		action: "read",
+		type: PermissionType.ACTION,
+	},
+	{
+		id: "6",
+		name: "角色管理创建",
+		code: "role-management:create",
+		resource: "role-management",
+		action: "create",
+		type: PermissionType.ACTION,
+	},
+	{
+		id: "7",
+		name: "角色管理更新",
+		code: "role-management:update",
+		resource: "role-management",
+		action: "update",
+		type: PermissionType.ACTION,
+	},
+	{
+		id: "8",
+		name: "角色管理删除",
+		code: "role-management:delete",
+		resource: "role-management",
+		action: "delete",
+		type: PermissionType.ACTION,
+	},
+];
+
+const SYSTEM_SETTINGS_PERMISSIONS = [
+	{
+		id: "9",
+		name: "系统设置读取",
+		code: "system-settings:read",
+		resource: "system-settings",
+		action: "read",
+		type: PermissionType.ACTION,
+	},
+	{
+		id: "10",
+		name: "系统设置更新",
+		code: "system-settings:update",
+		resource: "system-settings",
+		action: "update",
+		type: PermissionType.ACTION,
+	},
+];
+
+const DATA_ANALYSIS_PERMISSIONS = [
+	{
+		id: "11",
+		name: "数据分析读取",
+		code: "data-analysis:read",
+		resource: "data-analysis",
+		action: "read",
+		type: PermissionType.ACTION,
+	},
+];
+
+const ALL_PERMISSIONS = [
+	...USER_MANAGEMENT_PERMISSIONS,
+	...ROLE_MANAGEMENT_PERMISSIONS,
+	...SYSTEM_SETTINGS_PERMISSIONS,
+	...DATA_ANALYSIS_PERMISSIONS,
+];
+
+/**
  * User role mock
  */
-const ADMIN_ROLE = {
+const SUPER_ADMIN_ROLE = {
 	id: "4281707933534332",
-	name: "Admin",
-	label: "admin",
+	name: "超级管理员",
+	code: "super-admin",
+	label: "super-admin",
 	status: BasicStatus.ENABLE,
 	order: 1,
-	desc: "Super Admin",
-	permission: PERMISSION_LIST,
+	desc: "超级管理员，拥有所有权限",
+	isSuperAdmin: true,
+	permissions: ALL_PERMISSIONS,
 };
-const TEST_ROLE = {
+
+const ADMIN_ROLE = {
 	id: "9931665660771476",
-	name: "Test",
-	label: "test",
+	name: "管理员",
+	code: "admin",
+	label: "admin",
 	status: BasicStatus.ENABLE,
 	order: 2,
-	desc: "test",
-	permission: [DASHBOARD_PERMISSION, COMPONENTS_PERMISSION, FUNCTIONS_PERMISSION],
+	desc: "管理员，拥有部分权限",
+	permissions: [...USER_MANAGEMENT_PERMISSIONS, ...ROLE_MANAGEMENT_PERMISSIONS, ...DATA_ANALYSIS_PERMISSIONS],
 };
-export const ROLE_LIST = [ADMIN_ROLE, TEST_ROLE];
+
+const EDITOR_ROLE = {
+	id: "1234567890123456",
+	name: "编辑",
+	code: "editor",
+	label: "editor",
+	status: BasicStatus.ENABLE,
+	order: 3,
+	desc: "编辑，拥有编辑权限",
+	permissions: [
+		USER_MANAGEMENT_PERMISSIONS[0], // 只读
+		DATA_ANALYSIS_PERMISSIONS[0], // 只读
+	],
+};
+
+const VISITOR_ROLE = {
+	id: "7890123456789012",
+	name: "访客",
+	code: "visitor",
+	label: "visitor",
+	status: BasicStatus.ENABLE,
+	order: 4,
+	desc: "访客，只能查看",
+	permissions: [
+		USER_MANAGEMENT_PERMISSIONS[0], // 只读
+	],
+};
+export const ROLE_LIST = [SUPER_ADMIN_ROLE, ADMIN_ROLE, EDITOR_ROLE, VISITOR_ROLE];
 
 /**
  * User data mock
@@ -549,28 +690,50 @@ export const DEFAULT_USER = {
 	createdAt: faker.date.anytime(),
 	updatedAt: faker.date.recent(),
 	password: "demo1234",
-	role: ADMIN_ROLE,
-	permissions: ADMIN_ROLE.permission,
+	roles: [SUPER_ADMIN_ROLE],
+	permissions: SUPER_ADMIN_ROLE.permissions,
 };
-export const TEST_USER = {
+export const ADMIN_USER = {
 	id: "efaa20ea-4dc5-47ee-a200-8a899be29494",
-	username: "test",
+	username: "administrator",
 	password: "demo1234",
-	email: "test@slash.com",
+	email: "administrator@slash.com",
 	avatar: faker.image.avatarGitHub(),
 	createdAt: faker.date.anytime(),
 	updatedAt: faker.date.recent(),
-	role: TEST_ROLE,
-	permissions: TEST_ROLE.permission,
+	roles: [ADMIN_ROLE],
+	permissions: ADMIN_ROLE.permissions,
 };
-export const USER_LIST = [DEFAULT_USER, TEST_USER];
+export const EDITOR_USER = {
+	id: "1234567890123456",
+	username: "editor",
+	password: "demo1234",
+	email: "editor@slash.com",
+	avatar: faker.image.avatarGitHub(),
+	createdAt: faker.date.anytime(),
+	updatedAt: faker.date.recent(),
+	roles: [EDITOR_ROLE],
+	permissions: EDITOR_ROLE.permissions,
+};
+export const VISITOR_USER = {
+	id: "7890123456789012",
+	username: "visitor",
+	password: "demo1234",
+	email: "visitor@slash.com",
+	avatar: faker.image.avatarGitHub(),
+	createdAt: faker.date.anytime(),
+	updatedAt: faker.date.recent(),
+	roles: [VISITOR_ROLE],
+	permissions: VISITOR_ROLE.permissions,
+};
+export const USER_LIST = [DEFAULT_USER, ADMIN_USER, EDITOR_USER, VISITOR_USER];
 
 // * Hot update, updating user permissions, only effective in the development environment
 if (import.meta.hot) {
 	import.meta.hot.accept((newModule) => {
 		if (!newModule) return;
 
-		const { DEFAULT_USER, TEST_USER } = newModule;
+		const { DEFAULT_USER, ADMIN_USER, EDITOR_USER, VISITOR_USER } = newModule;
 
 		const {
 			userInfo,
@@ -579,7 +742,23 @@ if (import.meta.hot) {
 
 		if (!userInfo?.username) return;
 
-		const newUserInfo = userInfo.username === DEFAULT_USER.username ? DEFAULT_USER : TEST_USER;
+		let newUserInfo: typeof DEFAULT_USER | typeof ADMIN_USER | typeof EDITOR_USER | typeof VISITOR_USER;
+		switch (userInfo.username) {
+			case DEFAULT_USER.username:
+				newUserInfo = DEFAULT_USER;
+				break;
+			case ADMIN_USER.username:
+				newUserInfo = ADMIN_USER;
+				break;
+			case EDITOR_USER.username:
+				newUserInfo = EDITOR_USER;
+				break;
+			case VISITOR_USER.username:
+				newUserInfo = VISITOR_USER;
+				break;
+			default:
+				return;
+		}
 
 		setUserInfo(newUserInfo);
 

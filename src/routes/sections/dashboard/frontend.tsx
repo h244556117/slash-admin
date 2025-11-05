@@ -1,6 +1,8 @@
 import type { RouteObject } from "react-router";
 import { Navigate } from "react-router";
 import { Component } from "./utils";
+import PermissionAuthGuard from "@/routes/components/permission-auth-guard";
+import { PermissionAction, PermissionResource } from "#/enum";
 
 export function getFrontendDashboardRoutes(): RouteObject[] {
 	const frontendDashboardRoutes: RouteObject[] = [
@@ -43,10 +45,38 @@ export function getFrontendDashboardRoutes(): RouteObject[] {
 					path: "system",
 					children: [
 						{ index: true, element: <Navigate to="permission" replace /> },
-						{ path: "permission", element: Component("/pages/management/system/permission") },
-						{ path: "role", element: Component("/pages/management/system/role") },
-						{ path: "user", element: Component("/pages/management/system/user") },
-						{ path: "user/:id", element: Component("/pages/management/system/user/detail") },
+						{
+							path: "permission",
+							element: (
+								<PermissionAuthGuard resource={PermissionResource.SYSTEM_SETTINGS} action={PermissionAction.READ}>
+									{Component("/pages/management/system/permission")}
+								</PermissionAuthGuard>
+							),
+						},
+						{
+							path: "role",
+							element: (
+								<PermissionAuthGuard resource={PermissionResource.ROLE_MANAGEMENT} action={PermissionAction.READ}>
+									{Component("/pages/management/system/role")}
+								</PermissionAuthGuard>
+							),
+						},
+						{
+							path: "user",
+							element: (
+								<PermissionAuthGuard resource={PermissionResource.USER_MANAGEMENT} action={PermissionAction.READ}>
+									{Component("/pages/management/system/user")}
+								</PermissionAuthGuard>
+							),
+						},
+						{
+							path: "user/:id",
+							element: (
+								<PermissionAuthGuard resource={PermissionResource.USER_MANAGEMENT} action={PermissionAction.READ}>
+									{Component("/pages/management/system/user/detail")}
+								</PermissionAuthGuard>
+							),
+						},
 					],
 				},
 			],
